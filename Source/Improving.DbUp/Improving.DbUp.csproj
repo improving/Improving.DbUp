@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{55B0ADC9-EEB6-4AEA-B6C8-D5CC608DDCF8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Improving.DbUp</RootNamespace>
+    <AssemblyName>Improving.DbUp</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DbUp, Version=3.3.5.0, Culture=neutral, PublicKeyToken=4b419c53bdfd4cbf, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\dbup.3.3.5\lib\net35\DbUp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="DbUpdater.cs" />
+    <Compile Include="Env.cs" />
+    <Compile Include="Hashed\HashedEmbeddedScriptsProvider.cs" />
+    <Compile Include="Hashed\HashedSqlServerExtensions.cs" />
+    <Compile Include="Hashed\HashedSqlTableJournal.cs" />
+    <Compile Include="Hashed\Md5Utils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Deploy.ps1.pp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Improving.DbUp.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Scripts\Migration\readme.txt" />
+    <None Include="tools\install.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\readme.txt" />
+    <None Include="Scripts\Test\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Seed\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\AlwaysRun\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\BeforeMigration\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\FirstRun\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\Hash\0050_PreScripts\readme.txt" />
+    <Content Include="Scripts\Hash\0500_Schemas\readme.txt" />
+    <Content Include="Scripts\Hash\1000_Users\readme.txt" />
+    <Content Include="Scripts\Hash\1500_Types\readme.txt" />
+    <Content Include="Scripts\Hash\2000_Tables\readme.txt" />
+    <Content Include="Scripts\Hash\1750_Functions\readme.txt" />
+    <Content Include="Scripts\Hash\3000_Synonyms\readme.txt" />
+    <Content Include="Scripts\Hash\3500_StoredProcedures\readme.txt" />
+    <Content Include="Scripts\Hash\4000_Views\readme.txt" />
+    <Content Include="Scripts\Hash\4500_Jobs\readme.txt" />
+    <Content Include="Scripts\Hash\5000_Keys\readme.txt" />
+    <Content Include="Scripts\Hash\9000_PostScripts\readme.txt" />
+    <Content Include="Scripts\Hash\readme.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

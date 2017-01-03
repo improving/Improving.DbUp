@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Improving.DbUp</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Craig Neuwirt,Michael Dudley,Cori Drew</authors>
+    <owners>Improving</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial version of nuget package.</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>dbup DbUp DBUP Improving</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="DbUp" version="3.3.5"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="readme.txt" target="" />
+    <file src="readme.txt" target="content\Improving.DbUp.readme.txt" />
+    <file src="Deploy.ps1.pp" target="content\Deploy.ps1.pp" />
+    <file src="Scripts\" target="content\Scripts" />
+    <file src="tools\install.ps1" target="tools\install.ps1" />
+  </files>
+</package>

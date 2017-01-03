@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Improving.DbUp.QuickStart</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Craig Neuwirt,Michael Dudley,Cori Drew</authors>
+    <owners>Improving</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Quickstart package for Improving.DbUp</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>dbup DbUp DBUP start quickstart Start QuickStart Quickstart quick Quick</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Configuration" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="Improving.DbUp" version="1.0.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="readme.txt" target="" />
+    <file src="readme.txt" target="content\Improving.DbUp.QuickStart.readme.txt" />
+    <file src="App.config.transform" target="content\App.config.transform" />
+    <file src="Scripts\" target="content\Scripts" />
+    <file src="tools\install.ps1" target="tools\install.ps1" />
+  </files>
+</package>
