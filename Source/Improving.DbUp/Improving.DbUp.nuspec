@@ -8,7 +8,7 @@
     <owners>Improving</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial version of nuget package.</releaseNotes>
+    <releaseNotes></releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>dbup DbUp DBUP Improving</tags>
     <frameworkAssemblies>
