@@ -1,11 +1,11 @@
 param($installPath, $toolsPath, $package, $project)
- 
+
 Write-Host "Setting Deploy.ps1 to 'Copy always'"
-$item = $project.ProjectItems | where-object {$_.Name -eq "Deploy.ps1"} 
+$item = $project.ProjectItems | where-object {$_.Name -eq "Deploy.ps1"}
 $item.Properties.Item("CopyToOutputDirectory").Value = [int]1
 
 Write-Host "Setting readme.txt files' BuildActions to 'None'"
-$project.ProjectItems.ProjectItems.Item("Improving.DbUp.readme.txt").Properties.Item("BuildAction").Value = [int]0
+$project.ProjectItems.Item("Improving.DbUp.readme.txt").Properties.Item("BuildAction").Value = [int]0
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("readme.txt").Properties.Item("BuildAction").Value = [int]0
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("AlwaysRun").ProjectItems.Item("readme.txt").Properties.Item("BuildAction").Value = [int]0
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("BeforeMigration").ProjectItems.Item("readme.txt").Properties.Item("BuildAction").Value = [int]0

@@ -3,17 +3,11 @@ param($installPath, $toolsPath, $package, $project)
 Write-Host "Setting 0000_ApplyPermissions.sql BuildAction to 'EmbeddedResource'"
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("AlwaysRun").ProjectItems.Item("0000_ApplyPermissions.sql").Properties.Item("BuildAction").Value = [int]3
 
-Write-Host "Setting 9999_ChangeOwnership.sql BuildAction to 'EmbeddedResource'"
-$project.ProjectItems.Item("Scripts").ProjectItems.Item("AlwaysRun").ProjectItems.Item("9999_ChangeOwnership.sql").Properties.Item("BuildAction").Value = [int]3
-
 Write-Host "Setting 0000_UseDb.sql BuildAction to 'EmbeddedResource'"
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("BeforeMigration").ProjectItems.Item("0000_UseDb.sql").Properties.Item("BuildAction").Value = [int]3
 
 Write-Host "Setting 0000_CreateDatabase.sql BuildAction to 'EmbeddedResource'"
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("FirstRun").ProjectItems.Item("0000_CreateDatabase.sql").Properties.Item("BuildAction").Value = [int]3
-
-Write-Host "Setting 0000_MigrateMetaTableToSchemaVersions.sql BuildAction to 'EmbeddedResource'"
-$project.ProjectItems.Item("Scripts").ProjectItems.Item("Migration").ProjectItems.Item("0000_MigrateMetaTableToSchemaVersions.sql").Properties.Item("BuildAction").Value = [int]3
 
 Write-Host "Setting 0001_tSQLt.class.sql BuildAction to 'EmbeddedResource'"
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("Test").ProjectItems.Item("0001_tSQLt.class.sql").Properties.Item("BuildAction").Value = [int]3
@@ -23,7 +17,7 @@ Write-Host "Setting 0003_testSchemas.sql BuildAction to 'EmbeddedResource'"
 $project.ProjectItems.Item("Scripts").ProjectItems.Item("Test").ProjectItems.Item("0003_testSchemas.sql").Properties.Item("BuildAction").Value = [int]3
 
 Write-Host "Setting readme.txt files' BuildActions to 'None'"
-$project.ProjectItems.ProjectItems.Item("Improving.DbUp.QuickStart.readme.txt").Properties.Item("BuildAction").Value = [int]0
+$project.ProjectItems.Item("Improving.DbUp.QuickStart.readme.txt").Properties.Item("BuildAction").Value = [int]0
 
 Write-Host "Setting App.config to 'Copy always'"
 $item = $project.ProjectItems | where-object {$_.Name -eq "App.config"} 

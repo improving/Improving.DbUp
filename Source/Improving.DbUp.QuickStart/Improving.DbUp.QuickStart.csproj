@@ -48,7 +48,6 @@
   <ItemGroup>
     <None Include="readme.txt" />
     <Content Include="Scripts\AlwaysRun\0000_ApplyPermissions.sql" />
-    <Content Include="Scripts\AlwaysRun\9999_ChangeOwnership.sql" />
     <Content Include="Scripts\BeforeMigration\0000_UseDb.sql" />
     <Content Include="Scripts\FirstRun\0000_CreateDatabase.sql" />
     <Content Include="Scripts\Test\0001_tSQLt.class.sql" />
@@ -57,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config.transform" />
-    <None Include="Scripts\Migration\0000_MigrateMetaTableToSchemaVersions.sql.pp" />
     <None Include="Improving.DbUp.QuickStart.nuspec" />
     <None Include="tools\install.ps1" />
   </ItemGroup>
@@ -74,7 +72,6 @@
     <Folder Include="Scripts\Hash\4500_Jobs\" />
     <Folder Include="Scripts\Hash\5000_Keys\" />
     <Folder Include="Scripts\Hash\9000_PostScripts\" />
-    <Folder Include="Scripts\Seed\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

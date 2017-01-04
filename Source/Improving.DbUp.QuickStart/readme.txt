@@ -6,31 +6,31 @@
 
 Program.cs Quick-Start:
 -------------------------------------------------------------------------------
-	using Improving.DbUp;
-	using System;
-	using System.Collections.Generic;
-	using System.Configuration;
-	using System.Linq;
-	using System.Reflection;
+using System.Configuration;
+using System.Linq;
+using System.Reflection;
+using Improving.DbUp;
 
-    internal class Program
+internal class Program
+{
+    private static readonly string[] ConfigurationVariables =
     {
-        private static readonly string[] _configurationVariables =
-        {
-            "DbName","DatabaseLocation", "LogLocation", "Env", "AppUser", "TestUser"
-        };
+        "DbName","DatabaseLocation", "LogLocation", "Env", "AppUser", "TestUser"
+    };
 
-        private static int Main(string[] args)
-        {
-            Dictionary<string, string> scriptVariables = _configurationVariables.ToDictionary(s => s, s => ConfigurationManager.AppSettings[s]);
-            var env = (Env)Enum.Parse(typeof(Env), scriptVariables["Env"], true);
-            var shouldSeedData = env == Env.LOCAL;
+    private static int Main(string[] args)
+    {
+        const string connectionStringName = "connectionStringName";
+        var scriptVariables = ConfigurationVariables.ToDictionary(s => s, s => ConfigurationManager.AppSettings[s]);
+        var env = EnvParser.Parse(scriptVariables["Env"]);
+        var shouldSeedData = env == Env.LOCAL;
 
-            var dbName = ConfigurationManager.AppSettings["DbName"];
-            var dbUpdater = new DbUpdater(Assembly.GetExecutingAssembly(), "Scripts", dbName, scriptVariables, shouldSeedData, dbName, env);
-            return dbUpdater.Run() ? 0 : -1;
-        }
+        var dbName = ConfigurationManager.AppSettings["DbName"];
+        var dbUpdater = new DbUpdater(Assembly.GetExecutingAssembly(), "Scripts", dbName, connectionStringName, scriptVariables, shouldSeedData, env);
+        return dbUpdater.Run() ? 0 : -1;
     }
+}
+
 -------------------------------------------------------------------------------
 
 **************************************************************************

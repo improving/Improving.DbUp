@@ -15,7 +15,7 @@
       <frameworkAssembly assemblyName="System.Configuration" />
     </frameworkAssemblies>
     <dependencies>
-      <dependency id="Improving.DbUp" version="1.0.0" />
+      <dependency id="Improving.DbUp" version="$version$" />
     </dependencies>
   </metadata>
   <files>

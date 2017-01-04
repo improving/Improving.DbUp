@@ -56,7 +56,6 @@
     <Compile Include="Hashed\HashedSqlTableJournal.cs" />
     <Compile Include="Hashed\Md5Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Deploy.ps1.pp">
