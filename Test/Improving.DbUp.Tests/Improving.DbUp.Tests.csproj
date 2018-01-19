@@ -58,7 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Improving.DbUp\Improving.DbUp.csproj">
+    <ProjectReference Include="..\..\Source\Improving.DbUp\Improving.DbUp.csproj">
       <Project>{55b0adc9-eeb6-4aea-b6c8-d5cc608ddcf8}</Project>
       <Name>Improving.DbUp</Name>
     </ProjectReference>

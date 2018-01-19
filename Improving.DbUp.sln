@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{6A5A7337-11EB-4B20-8B60-9FBF234019D4}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Improving.DbUp", "Source\Im
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Improving.DbUp.QuickStart", "Source\Improving.DbUp.QuickStart\Improving.DbUp.QuickStart.csproj", "{39B94D63-09AD-46E5-B371-F4EB9591FCF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Improving.DbUp.Tests", "Source\Improving.DbUp.Tests\Improving.DbUp.Tests.csproj", "{47826E09-A4D6-400E-872C-DC8B7D6F0AFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Improving.DbUp.Tests", "Test\Improving.DbUp.Tests\Improving.DbUp.Tests.csproj", "{47826E09-A4D6-400E-872C-DC8B7D6F0AFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
