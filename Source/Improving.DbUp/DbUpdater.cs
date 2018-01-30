@@ -206,7 +206,7 @@ namespace Improving.DbUp
 
             var builder =
                 DeployChanges.To
-                    .HashedSqlDatabase(sqlConnectionManager)
+                    .HashedSqlDatabase(sqlConnectionManager, _versionTableSchema, _versionTableName)
                     .WithExecutionTimeout(TimeSpan.FromSeconds(2147483647))
                     .WithHashedScriptsEmbeddedInAssembly(_migrationAssembly, name => name.StartsWith(scriptPrefix), journal)
                     .WithVariables(ScriptVariables)

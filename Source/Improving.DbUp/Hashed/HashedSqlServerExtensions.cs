@@ -11,12 +11,12 @@
     {
         public const string VersionTableName = "SchemaVersions";
 
-        public static UpgradeEngineBuilder HashedSqlDatabase(this SupportedDatabases supported, SqlConnectionManager connectionManager)
+        public static UpgradeEngineBuilder HashedSqlDatabase(this SupportedDatabases supported, SqlConnectionManager connectionManager, string versionTableSchema, string versionTableName)
         {
             var builder = new UpgradeEngineBuilder();
             builder.Configure(c => c.ConnectionManager = connectionManager);
-            builder.Configure(c => c.ScriptExecutor = new SqlScriptExecutor(() => c.ConnectionManager, () => c.Log, null, () => c.VariablesEnabled, c.ScriptPreprocessors));
-            builder.Configure(c => c.Journal = new HashedSqlTableJournal(() => c.ConnectionManager, () => c.Log, null, VersionTableName));
+            builder.Configure(c => c.ScriptExecutor = new SqlScriptExecutor(() => c.ConnectionManager, () => c.Log, versionTableSchema, () => c.VariablesEnabled, c.ScriptPreprocessors));
+            builder.Configure(c => c.Journal = new HashedSqlTableJournal(() => c.ConnectionManager, () => c.Log, versionTableSchema, versionTableName));
             return builder;
         }
 
