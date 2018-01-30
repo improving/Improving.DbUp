@@ -20,26 +20,32 @@ namespace Improving.DbUp
         private readonly Assembly _migrationAssembly;
         private readonly bool _seedData;
         private readonly Env _env;
+		private readonly string _versionTableSchema;
+		private readonly string _versionTableName;
 
-        public DbUpdater(Assembly migrationAssembly,
+		public DbUpdater(Assembly migrationAssembly,
             string folderName,
             string databaseName,
             string connectionStringName,
             IDictionary<string, string> scriptVariables,
             bool SeedData = false,
-            Env env = Env.Undefined)
+            Env env = Env.Undefined,
+			string versionTableName = HashedSqlServerExtensions.VersionTableName,
+			string versionTableSchema = null)
         {
-            _namespacePrefix   = migrationAssembly.GetName().Name + ".";
-            _migrationAssembly = migrationAssembly;
-            _seedData          = SeedData;
-            _env               = env;
+            _namespacePrefix    = migrationAssembly.GetName().Name + ".";
+            _migrationAssembly  = migrationAssembly;
+            _seedData           = SeedData;
+            _env                = env;
+	        _versionTableName   = versionTableName;
+	        _versionTableSchema = versionTableSchema;
 
             ConnectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString + ";App=" + databaseName + "Migrations";
             UseTransactions  = true;
             DatabaseName     = databaseName;
             FolderName       = folderName;
             ScriptVariables  = scriptVariables;
-        }
+		}
 
         public string FolderName       { get; }
         public string DatabaseName     { get; }
@@ -165,7 +171,8 @@ namespace Improving.DbUp
                     .WithExecutionTimeout(TimeSpan.FromSeconds(2147483647))
                     .WithScriptsEmbeddedInAssembly(_migrationAssembly,
                         name => name.StartsWith(scriptPrefix))
-                    .WithVariables(ScriptVariables)
+					.JournalToSqlTable(_versionTableSchema, _versionTableName)
+					.WithVariables(ScriptVariables)
                     .LogToConsole();
 
             PerformUpgrade(customBuilderTransform, builder);
@@ -195,7 +202,7 @@ namespace Improving.DbUp
         {
             var sqlConnectionManager = new SqlConnectionManager(connectionString);
             var log = new ConsoleUpgradeLog();
-            var journal = new HashedSqlTableJournal(() => sqlConnectionManager, () => log, null, HashedSqlServerExtensions.VersionTableName); 
+            var journal = new HashedSqlTableJournal(() => sqlConnectionManager, () => log, _versionTableSchema, _versionTableName); 
 
             var builder =
                 DeployChanges.To

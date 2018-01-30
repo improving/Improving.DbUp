@@ -23,3 +23,4 @@ OADSI.exe.config
 *.sqlproj.user
 *.orig
 *.nupkg
+/.vs
