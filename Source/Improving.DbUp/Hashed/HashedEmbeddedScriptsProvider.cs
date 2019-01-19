@@ -8,12 +8,11 @@
     using global::DbUp.Engine;
     using global::DbUp.Engine.Transactions;
 
-    public class HashedEmbeddedScriptsProvider : IScriptProvider
+    public class HashedEmbeddedScriptsProvider : HashedScriptsProvider, IScriptProvider
     {
         private readonly Assembly _assembly;
         private readonly Encoding _encoding;
         private readonly Func<string, bool> _filter;
-        private readonly HashedSqlTableJournal _journal;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="HashedEmbeddedScriptsProvider" /> class.
@@ -21,30 +20,18 @@
         /// <param name="assembly">The assemblies to search.</param>
         /// <param name="filter">The filter.</param>
         /// <param name="encoding">The encoding.</param>
-        /// <param name="journal">The Journal</param>
         public HashedEmbeddedScriptsProvider(Assembly assembly, Func<string, bool> filter, Encoding encoding,
-            IJournal journal)
+            IHashedJournal journal)
+            : base(journal)
         {
             _assembly = assembly;
             _filter = filter;
             _encoding = encoding;
-            _journal = (HashedSqlTableJournal)journal;
         }
 
-        /// <summary>
-        ///     Gets all scripts that should be executed.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
+        protected override IEnumerable<SqlScript> GetAllScripts()
         {
-            var executedScriptInfo = _journal.GetExecutedScriptDictionary();
-            var allScripts = GetAssemblyScripts();
-
-            return allScripts
-                .Where(script =>
-                !executedScriptInfo.ContainsKey(script.Name)
-                    || (executedScriptInfo.ContainsKey(script.Name) && executedScriptInfo[script.Name] != Md5Utils.Md5EncodeString(script.Contents)))
-                .ToList();
+            return this.GetAssemblyScripts();
         }
 
         private IEnumerable<SqlScript> GetAssemblyScripts()

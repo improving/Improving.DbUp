@@ -3,49 +3,59 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using DbUp;
 using DbUp.Builder;
+using DbUp.Engine;
+using DbUp.Engine.Output;
 using DbUp.Helpers;
+using DbUp.ScriptProviders;
+using DbUp.SqlServer;
+using Improving.DbUp.Hashed;
 
 namespace Improving.DbUp
 {
-    using global::DbUp.Engine.Output;
-    using global::DbUp.Support.SqlServer;
-    using Hashed;
-
-    public class DbUpdater
+    public abstract class DbUpdater
     {
-        private readonly string _namespacePrefix;
-        private readonly Assembly _migrationAssembly;
         private readonly bool _seedData;
         private readonly Env _env;
+        private readonly IUpgradeLog _upgradeLog;
 
-        public DbUpdater(Assembly migrationAssembly,
+        public virtual string FolderName { get; }
+        public virtual string DatabaseName { get; }
+        public virtual string ConnectionString { get; }
+        public virtual bool UseTransactions { get; set; }
+        public virtual IDictionary<string, string> ScriptVariables { get; }
+
+        protected abstract string RootPrefix { get; }
+        protected abstract string PathSeparator { get; }
+
+        public DbUpdater(
             string folderName,
             string databaseName,
             string connectionStringName,
             IDictionary<string, string> scriptVariables,
-            bool SeedData = false,
-            Env env = Env.Undefined)
+            bool seedData = false,
+            Env env = Env.Undefined,
+            IUpgradeLog upgradeLog = null)
         {
-            _namespacePrefix   = migrationAssembly.GetName().Name + ".";
-            _migrationAssembly = migrationAssembly;
-            _seedData          = SeedData;
-            _env               = env;
+            _seedData = seedData;
+            _env = env;
+
+            _upgradeLog = upgradeLog;
+            if (_upgradeLog == null)
+            {
+                _upgradeLog = new ConsoleUpgradeLog();
+            }
 
             ConnectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString + ";App=" + databaseName + "Migrations";
-            UseTransactions  = true;
-            DatabaseName     = databaseName;
-            FolderName       = folderName;
-            ScriptVariables  = scriptVariables;
+            UseTransactions = true;
+            DatabaseName = databaseName;
+            FolderName = folderName;
+            ScriptVariables = scriptVariables;
         }
-
-        public string FolderName       { get; }
-        public string DatabaseName     { get; }
-        public string ConnectionString { get; }
-        public bool UseTransactions    { get; set; }
-        public IDictionary<string, string> ScriptVariables { get; }
 
         public bool Run()
         {
@@ -53,36 +63,34 @@ namespace Improving.DbUp
             {
                 if (IsNew())
                 {
-                    Console.WriteLine("No '{0}' database found. One will be created.", DatabaseName);
+                    _upgradeLog.WriteInformation("No '{0}' database found. One will be created.", DatabaseName);
                     CreateDatabase();
                 }
 
-                Console.WriteLine("Performing beforeMigrations for '{0}' database.", DatabaseName);
+                _upgradeLog.WriteInformation("Performing beforeMigrations for '{0}' database.", DatabaseName);
                 BeforeMigration();
 
-                Console.WriteLine("Performing migrations for '{0}' database.", DatabaseName);
+                _upgradeLog.WriteInformation("Performing migrations for '{0}' database.", DatabaseName);
                 MigrateDatabase();
 
-                Console.WriteLine("Executing hashed scripts for '{0}' database.", DatabaseName);
+                _upgradeLog.WriteInformation("Executing hashed scripts for '{0}' database.", DatabaseName);
                 HashedScripts();
 
-                Console.WriteLine("Executing always run scripts for '{0}' database.", DatabaseName);
+                _upgradeLog.WriteInformation("Executing always run scripts for '{0}' database.", DatabaseName);
                 AlwaysRun();
 
-                Console.WriteLine("Executing test scripts for '{0}' database. These are run every time.", DatabaseName);
+                _upgradeLog.WriteInformation("Executing test scripts for '{0}' database. These are run every time.", DatabaseName);
                 UpdateTests();
 
                 if (_seedData)
                 {
-                    Console.WriteLine("Executing seed scripts for '{0}' database.", DatabaseName);
+                    _upgradeLog.WriteInformation("Executing seed scripts for '{0}' database.", DatabaseName);
                     SeedDatabase();
                 }
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e.Message);
-                Console.ResetColor();
+                _upgradeLog.WriteError(e.Message);
 
                 return false;
             }
@@ -93,7 +101,7 @@ namespace Improving.DbUp
         private void HashedScripts()
         {
             ExecuteHashedDatabaseActions(
-                _namespacePrefix + FolderName + ".Hash",
+                JoinPath(RootPrefix, FolderName, "Hash"),
                 ConnectionString,
                 builder => UseTransactions ? builder.WithTransactionPerScript() : builder);
         }
@@ -101,7 +109,7 @@ namespace Improving.DbUp
         private void AlwaysRun()
         {
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".AlwaysRun",
+                JoinPath(RootPrefix, FolderName, "AlwaysRun"),
                 ConnectionString,
                 builder => builder.JournalTo(new NullJournal()));
         }
@@ -109,7 +117,7 @@ namespace Improving.DbUp
         private void BeforeMigration()
         {
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".BeforeMigration",
+                JoinPath(RootPrefix, FolderName, "BeforeMigration"),
                 ConnectionString,
                 builder => UseTransactions ? builder.WithTransactionPerScript() : builder);
         }
@@ -117,7 +125,7 @@ namespace Improving.DbUp
         private void MigrateDatabase()
         {
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".Migration",
+                JoinPath(RootPrefix, FolderName, "Migration"),
                 ConnectionString,
                 builder => UseTransactions ? builder.WithTransactionPerScript() : builder);
         }
@@ -126,11 +134,11 @@ namespace Improving.DbUp
         {
             if (_env != Env.LOCAL && _env != Env.DEV && _env != Env.QA)
             {
-                Console.WriteLine("Scripts in the test folder are only executed in LOCAL, DEV and QA");
+                _upgradeLog.WriteInformation("Scripts in the test folder are only executed in LOCAL, DEV and QA");
                 return;
             }
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".Test",
+                JoinPath(RootPrefix, FolderName, "Test"),
                 ConnectionString,
                 builder => builder.JournalTo(new NullJournal()));
         }
@@ -138,7 +146,7 @@ namespace Improving.DbUp
         private void SeedDatabase()
         {
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".Seed",
+                JoinPath(RootPrefix, FolderName, "Seed"),
                 ConnectionString,
                 builder => UseTransactions ? builder.WithTransactionPerScript() : builder);
         }
@@ -151,7 +159,7 @@ namespace Improving.DbUp
             };
 
             ExecuteDatabaseActions(
-                _namespacePrefix + FolderName + ".FirstRun",
+                JoinPath(RootPrefix, FolderName, "FirstRun"),
                 masterDbSqlConnection.ConnectionString,
                 builder => builder.JournalTo(new NullJournal()));
         }
@@ -163,13 +171,14 @@ namespace Improving.DbUp
                 DeployChanges.To
                     .SqlDatabase(connectionString)
                     .WithExecutionTimeout(TimeSpan.FromSeconds(2147483647))
-                    .WithScriptsEmbeddedInAssembly(_migrationAssembly,
-                        name => name.StartsWith(scriptPrefix))
+                    .WithScripts(UnderlyingScriptProvider(scriptPrefix))
                     .WithVariables(ScriptVariables)
                     .LogToConsole();
-
+            
             PerformUpgrade(customBuilderTransform, builder);
         }
+
+        protected abstract IScriptProvider UnderlyingScriptProvider(string scriptPrefix);
 
         private void PerformUpgrade(Func<UpgradeEngineBuilder, UpgradeEngineBuilder> customBuilderTransform, UpgradeEngineBuilder builder)
         {
@@ -178,15 +187,12 @@ namespace Improving.DbUp
 
             if (!createResult.Successful)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(createResult.Error);
+                _upgradeLog.WriteError(createResult.Error.Message);
                 throw createResult.Error;
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Success!");
-                Console.ResetColor();
+                _upgradeLog.WriteInformation("Success!");
             }
         }
 
@@ -194,14 +200,13 @@ namespace Improving.DbUp
             Func<UpgradeEngineBuilder, UpgradeEngineBuilder> customBuilderTransform)
         {
             var sqlConnectionManager = new SqlConnectionManager(connectionString);
-            var log = new ConsoleUpgradeLog();
-            var journal = new HashedSqlTableJournal(() => sqlConnectionManager, () => log, null, HashedSqlServerExtensions.VersionTableName); 
+            var journal = new HashedSqlTableJournal(() => sqlConnectionManager, () => _upgradeLog, null, HashedSqlServerExtensions.VersionTableName);
 
             var builder =
                 DeployChanges.To
                     .HashedSqlDatabase(sqlConnectionManager)
                     .WithExecutionTimeout(TimeSpan.FromSeconds(2147483647))
-                    .WithHashedScriptsEmbeddedInAssembly(_migrationAssembly, name => name.StartsWith(scriptPrefix), journal)
+                    .WithHashedScripts(UnderlyingScriptProvider(scriptPrefix), journal)
                     .WithVariables(ScriptVariables)
                     .LogToConsole();
 
@@ -230,5 +235,45 @@ namespace Improving.DbUp
                 }
             }
         }
+
+        private string JoinPath(params string[] values)
+        {
+            return string.Join(PathSeparator, values.Where(p => !String.IsNullOrWhiteSpace(p?.Trim())));
+        }
+
+        #region Factory Methods
+        public static DbUpdater UsingEmbeddedScripts(Assembly migrationAssembly,
+            string folderName,
+            string databaseName,
+            string connectionStringName,
+            IDictionary<string, string> scriptVariables,
+            bool seedData = false,
+            Env env = Env.Undefined,
+            IUpgradeLog logger = null)
+        {
+            return new EmbeddedScriptsDbUpdater(migrationAssembly, folderName, databaseName, connectionStringName, scriptVariables, seedData, env, logger);
+        }
+
+        public static DbUpdater UsingScriptsInFileSystem(string folderName,
+            string databaseName,
+            string connectionStringName,
+            IDictionary<string, string> scriptVariables,
+            FileSystemScriptOptions fileSystemScriptOptions = null,
+            bool seedData = false,
+            Env env = Env.Undefined,
+            IUpgradeLog logger = null)
+        {
+            if (fileSystemScriptOptions == null)
+            {
+                fileSystemScriptOptions = new FileSystemScriptOptions()
+                {
+                    IncludeSubDirectories = true,
+                    Filter = name => name.EndsWith("*.sql")
+                };
+            }
+
+            return new FileSystemScriptsDbUpdater(folderName, fileSystemScriptOptions, databaseName, connectionStringName, scriptVariables, seedData, env, logger);
+        }
+        #endregion
     }
 }

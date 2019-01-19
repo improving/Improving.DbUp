@@ -3,36 +3,31 @@
     using System;
     using System.Reflection;
     using System.Text;
+    using global::DbUp;
     using global::DbUp.Builder;
     using global::DbUp.Engine;
-    using global::DbUp.Support.SqlServer;
-
+    using global::DbUp.ScriptProviders;
+    using global::DbUp.SqlServer;
+    
     public static class HashedSqlServerExtensions
     {
         public const string VersionTableName = "SchemaVersions";
+
+        private static Func<UpgradeConfiguration, IJournal> JournalFactory = (UpgradeConfiguration upgradeConfiguration) => new HashedSqlTableJournal(() => upgradeConfiguration.ConnectionManager, () => upgradeConfiguration.Log, null, VersionTableName);
 
         public static UpgradeEngineBuilder HashedSqlDatabase(this SupportedDatabases supported, SqlConnectionManager connectionManager)
         {
             var builder = new UpgradeEngineBuilder();
             builder.Configure(c => c.ConnectionManager = connectionManager);
-            builder.Configure(c => c.ScriptExecutor = new SqlScriptExecutor(() => c.ConnectionManager, () => c.Log, null, () => c.VariablesEnabled, c.ScriptPreprocessors));
-            builder.Configure(c => c.Journal = new HashedSqlTableJournal(() => c.ConnectionManager, () => c.Log, null, VersionTableName));
+            builder.Configure(c => c.ScriptExecutor = new SqlScriptExecutor(() => c.ConnectionManager, () => c.Log, null, () => c.VariablesEnabled, c.ScriptPreprocessors, () => JournalFactory(c)));
+            builder.Configure(c => c.Journal = JournalFactory(c));
             return builder;
         }
-
-        /// <summary>
-        /// Adds all scripts found as embedded resources in the given assembly.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="assembly">The assembly.</param>
-        /// <param name="filter">The filter.</param>
-        /// <param name="journal">The journal.</param>
-        /// <returns>
-        /// The same builder
-        /// </returns>
-        public static UpgradeEngineBuilder WithHashedScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, IJournal journal)
+        
+        public static UpgradeEngineBuilder WithHashedScripts(this UpgradeEngineBuilder builder, IScriptProvider scriptProvider, IHashedJournal journal)
         {
-            return WithScripts(builder, new HashedEmbeddedScriptsProvider(assembly, filter, Encoding.Default, journal));
+            var hashedScriptsProvider = new HashedScriptsProvider(journal, scriptProvider);
+            return WithScripts(builder, hashedScriptsProvider);
         }
 
         /// <summary>
