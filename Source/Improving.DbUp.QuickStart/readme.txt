@@ -26,7 +26,9 @@ internal class Program
         var shouldSeedData = env == Env.LOCAL;
 
         var dbName = ConfigurationManager.AppSettings["DbName"];
-        var dbUpdater = new DbUpdater(Assembly.GetExecutingAssembly(), "Scripts", dbName, connectionStringName, scriptVariables, shouldSeedData, env);
+        var dbUpdater = DbUpdater.UsingEmbeddedScripts(Assembly.GetExecutingAssembly(), "Scripts", dbName, connectionStringName, scriptVariables, shouldSeedData, env);
+		// Or
+		// var dbUpdater = DbUpdater.UsingScriptsInFileSystem(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Scripts"), dbName, connectionStringName, scriptVariables, null, shouldSeedData, env)
         return dbUpdater.Run() ? 0 : -1;
     }
 }
