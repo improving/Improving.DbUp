@@ -29,11 +29,11 @@ namespace Improving.DbUp
 
         protected override string RootPrefix => String.Empty;
 
-        protected override string PathSeparator => Path.PathSeparator.ToString();
+        protected override string PathSeparator => Path.DirectorySeparatorChar.ToString();
 
         protected override IScriptProvider UnderlyingScriptProvider(string scriptPrefix)
         {
-            return new FileSystemScriptProvider(FolderName, _fileSystemScriptOptions);
+            return new FileSystemScriptProvider(scriptPrefix, _fileSystemScriptOptions);
         }
     }
 }

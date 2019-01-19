@@ -85,8 +85,6 @@ namespace Improving.DbUp.Hashed
                 $"  and column_name = 'ScriptHash')" +
                 $"  alter table {FqSchemaTableName} add ScriptHash nvarchar(255)";
 
-            Log().WriteInformation(string.Format($"Adding ScriptHash column to ${FqSchemaTableName} table"));
-            // We will never change the schema of the initial table create.
             using (var command = dbCommandFactory())
             {
                 command.CommandText = createHashColumnSql;

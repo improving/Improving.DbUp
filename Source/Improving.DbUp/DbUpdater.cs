@@ -268,7 +268,7 @@ namespace Improving.DbUp
                 fileSystemScriptOptions = new FileSystemScriptOptions()
                 {
                     IncludeSubDirectories = true,
-                    Filter = name => name.EndsWith("*.sql")
+                    Filter = name => name.EndsWith(".sql")
                 };
             }
 
