@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Improving.DbUp</id>
+    <id>Improving.DbUp.FileSystem</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>Craig Neuwirt,Michael Dudley,Cori Drew,Rumit Parakhiya</authors>
